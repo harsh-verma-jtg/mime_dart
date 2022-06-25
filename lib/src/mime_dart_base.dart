@@ -11,20 +11,23 @@ import 'package:mime_dart/src/mime_data/mime_data.dart';
 /// 
 /// - [getMime]
 class Mime {
-  /// This method helps in getting extension from type
+  /// This method helps in getting extensions from type
   /// 
   /// [type] takes a [String] input. For Example: `application/pdf`
   /// 
-  /// Returns `pdf`
-  static String? getExtensionFromType(String type) {
-    if (!database.containsKey(type)) {
+  /// Returns `[pdf]`
+  static List<String>? getExtensionFromType(String type) {
+    if (type.isEmpty) {
       return null;
     }
 
+    if (!database.containsKey(type)) {
+      return null;
+    }
     MimeData mime = MimeData.fromJson(database[type] as Map<String, Object?>);
 
     if (mime.extensions != null && mime.extensions!.isNotEmpty) {
-      return mime.extensions?.first;
+      return mime.extensions;
     }
 
     return null;
@@ -34,17 +37,26 @@ class Mime {
   /// 
   /// [extension] takes [String] as input. For Example: `pdf`
   /// 
-  /// Returns `application/pdf`
-  static String? getTypeFromExtension(String extension) {
+  /// Returns `[application/pdf]`
+  static List<String>? getTypeFromExtension(String extension) {
+    if (extension.isEmpty) {
+      return null;
+    }
+
+    List<String> types = [];
     for (final entry in database.entries) {
       final mime = MimeData.fromJson(entry.value as Map<String, Object?>);
 
       if (mime.extensions != null && mime.extensions!.contains(extension)) {
-        return entry.key;
+        types.add(entry.key);
       }
     }
 
-    return null;
+    if (types.isEmpty) {
+      return null;
+    }
+
+    return types;
   }
 
   /// This method helps in getting MimeData from type
